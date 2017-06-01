@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="hairdress_pos" Class="hairdresser_posDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=LAPTOP-E1K009VH\GSHSDB;Initial Catalog=hairdress_pos;Integrated Security=True" SettingsObjectName="hairdresser_POS.Properties.Settings" SettingsPropertyName="hairdress_posConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.appointments" Member="appointments">
+    <Type Name="appointment">
+      <Column Name="appointmentID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="appointmentTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="appointmentName" Type="System.String" DbType="VarChar(128)" CanBeNull="true" />
+      <Column Name="appointmentNumber" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="appointmentDresser" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="hairdresser_appointment" Member="hairdresser" ThisKey="appointmentDresser" OtherKey="hairdressersID" Type="hairdresser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.cuts" Member="cuts">
+    <Type Name="cut">
+      <Column Name="cutID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="cutIncludes" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="hairlength" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="cost" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Association Name="hairservice_cut" Member="hairservice" ThisKey="cutID" OtherKey="serviceID" Type="hairservice" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.hairdressers" Member="hairdressers">
+    <Type Name="hairdresser">
+      <Column Name="hairdressersID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="VarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="LastName" Type="System.String" DbType="VarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Number" Type="System.String" DbType="Char(10) NOT NULL" CanBeNull="false" />
+      <Association Name="hairdresser_appointment" Member="appointments" ThisKey="hairdressersID" OtherKey="appointmentDresser" Type="appointment" />
+    </Type>
+  </Table>
+  <Table Name="dbo.hairproducts" Member="hairproducts">
+    <Type Name="hairproduct">
+      <Column Name="productID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Number" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="productType" Type="System.String" DbType="VarChar(64)" CanBeNull="true" />
+      <Column Name="productInfo" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="instock" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="cost" Type="System.Decimal" DbType="Decimal(6,2)" CanBeNull="true" />
+      <Association Name="hairproduct_inventoryItem" Member="inventoryItems" ThisKey="productID" OtherKey="productID" Type="inventoryItem" />
+      <Association Name="hairservice_hairproduct" Member="hairservice" ThisKey="productID" OtherKey="serviceID" Type="hairservice" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.hairservices" Member="hairservices">
+    <Type Name="hairservice">
+      <Column Name="serviceID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="serviceName" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="hairservice_cut" Member="cut" ThisKey="serviceID" OtherKey="cutID" Type="cut" Cardinality="One" />
+      <Association Name="hairservice_hairproduct" Member="hairproduct" ThisKey="serviceID" OtherKey="productID" Type="hairproduct" Cardinality="One" />
+      <Association Name="hairservice_reciept" Member="reciepts" ThisKey="serviceID" OtherKey="hairserviceID" Type="reciept" />
+    </Type>
+  </Table>
+  <Table Name="dbo.inventory" Member="inventories">
+    <Type Name="inventory">
+      <Column Name="inventoryID" Type="System.String" DbType="Char(36) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="invoiceID" Type="System.String" DbType="VarChar(48)" CanBeNull="true" />
+      <Column Name="value" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="itemCount" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="invoiceDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="recieveDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="inventory_inventoryItem" Member="inventoryItems" ThisKey="inventoryID" OtherKey="inventoryID" Type="inventoryItem" />
+    </Type>
+  </Table>
+  <Table Name="dbo.inventoryItems" Member="inventoryItems">
+    <Type Name="inventoryItem">
+      <Column Name="inventoryID" Type="System.String" DbType="Char(36) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="productID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="quantity" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="inventory_inventoryItem" Member="inventory" ThisKey="inventoryID" OtherKey="inventoryID" Type="inventory" IsForeignKey="true" />
+      <Association Name="hairproduct_inventoryItem" Member="hairproduct" ThisKey="productID" OtherKey="productID" Type="hairproduct" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.reciept" Member="reciepts">
+    <Type Name="reciept">
+      <Column Name="transactionID" Type="System.String" DbType="Char(36) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="hairserviceID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="quantity" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="hairservice_reciept" Member="hairservice" ThisKey="hairserviceID" OtherKey="serviceID" Type="hairservice" IsForeignKey="true" />
+      <Association Name="transaction_reciept" Member="transaction" ThisKey="transactionID" OtherKey="transactionID" Type="transaction" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.transactions" Member="transactions">
+    <Type Name="transaction">
+      <Column Name="transactionID" Type="System.String" DbType="Char(36) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="value" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="items" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Association Name="transaction_reciept" Member="reciepts" ThisKey="transactionID" OtherKey="transactionID" Type="reciept" />
+    </Type>
+  </Table>
+</Database>
